@@ -1,0 +1,5 @@
+hàm validate() dùng để kiểm tra giá trị đầu vào: tên, tuổi, email....
+hàm handleSetLimit() để reset trang về 1
+Hàm/khối xử lý nằm trong component UserTable. Dòng tính STT là:
+
+<td>{((Number(page) - 1) * Number(limit)) + index + 1}</td>

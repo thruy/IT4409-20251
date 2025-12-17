@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Người dùng</title>
+
+    <!-- React CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background: linear-gradient(180deg, #f7f9fc, #eef3f8);
+            color: #222;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 28px;
+            border-radius: 10px;
+            box-shadow: 0 6px 24px rgba(20, 30, 50, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        h1 {
+            margin-bottom: 18px;
+            color: #2b6a4a;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            margin-bottom: 14px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 15px;
+            border: 1px solid #d7dfe6;
+            border-radius: 8px;
+            background: #fbfdff;
+            transition: box-shadow .15s, border-color .15s;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #7db77a;
+            box-shadow: 0 4px 18px rgba(125, 183, 122, 0.12);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 14px;
+            margin: 0 6px 6px 0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: transform .08s ease, box-shadow .12s ease, opacity .12s;
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(180deg, #45a163, #378b52);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(56, 121, 76, 0.12);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid #d2d8dd;
+            color: #334155;
+        }
+
+        .btn-danger {
+            background: linear-gradient(180deg, #ef5b5b, #d94444);
+            color: #fff;
+        }
+
+        /* Table */
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+            font-size: 14px;
+            min-width: 720px;
+        }
+
+        th,
+        td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #eef1f5;
+        }
+
+        th {
+            background: linear-gradient(90deg, #3fa76e, #2f8b5a);
+            color: #fff;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:nth-child(even) {
+            background: #fbfdff;
+        }
+
+        tr:hover {
+            background: #f1f7f3;
+        }
+
+        td small {
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pagination select {
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: 1px solid #d7dfe6;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(34, 50, 70, 0.03);
+            cursor: pointer;
+        }
+
+        .pagination button[disabled] {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            /* top:0; right:0; bottom:0; left:0; */
+            background: rgba(10, 15, 20, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1200;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 520px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px 22px;
+            box-shadow: 0 12px 40px rgba(15, 25, 40, 0.18);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 12px;
+            color: #203a2b;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px 12px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid #d7dfe6;
+            font-size: 14px;
+            background: #fbfdff;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .modal-actions .btn {
+            min-width: 80px;
+        }
+
+        .error {
+            color: #b91c1c;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        /* Responsive */
+        @media (max-width: 720px) {
+            .container {
+                padding: 16px;
+                margin: 12px;
+            }
+
+            table {
+                min-width: 600px;
+                font-size: 13px;
+            }
+
+            th,
+            td {
+                padding: 10px;
+            }
+
+            .modal-content {
+                padding: 16px;
+            }
+
+            .btn {
+                padding: 7px 10px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        function App() {
+            const MIN_LIMIT = 1;
+            const MAX_LIMIT = 100;
+
+            const [users, setUsers] = React.useState([]);
+            const [page, setPage] = React.useState(1);
+            const [limit, setLimit] = React.useState(5);
+            const [search, setSearch] = React.useState("");
+            const [total, setTotal] = React.useState(0);
+            const [totalPages, setTotalPages] = React.useState(0);
+            const [showModal, setShowModal] = React.useState(false);
+            const [editingUser, setEditingUser] = React.useState(null);
+            const [loading, setLoading] = React.useState(false);
+            // reset page to 1
+            const handleSetLimit = (l) => {
+                const n = Number(l) || MIN_LIMIT;
+                const clamped = Math.min(Math.max(n, MIN_LIMIT), MAX_LIMIT);
+                setLimit(clamped);
+                setPage(1);
+            };
+
+            const handleSetPage = (p) => {
+                const n = Number(p) || 1;
+                const tp = Math.max(1, totalPages || 1);
+                const clamped = Math.min(Math.max(1, n), tp);
+                setPage(clamped);
+            };
+
+            const isValidObjectId = (id) => typeof id === "string" && /^[a-fA-F0-9]{24}$/.test(id);
+            const fetchUsers = React.useCallback(() => {
+                const safePage = Math.max(1, Number(page) || 1);
+                const safeLimit = Math.min(Math.max(Number(limit) || MIN_LIMIT, MIN_LIMIT), MAX_LIMIT);
+                const q = encodeURIComponent((search || "").trim());
+
+                const listUrl = `http://localhost:3000/api/users?page=${safePage}&limit=${safeLimit}&search=${q}`;
+                const countUrl = `http://localhost:3000/api/users/count?search=${q}`;
+
+                setLoading(true);
+                Promise.all([fetch(listUrl), fetch(countUrl)])
+                    .then(responses => {
+                        return Promise.all(responses.map(r => {
+                            if (!r.ok) {
+                                return r.text().then(t => {
+                                    let msg = t;
+                                    try { msg = JSON.parse(t).message || JSON.parse(t).error || t; } catch (e) { /* ignore */ }
+                                    const err = new Error(msg || r.statusText);
+                                    err.status = r.status;
+                                    throw err;
+                                });
+                            }
+                            return r.json();
+                        }));
+                    })
+                    .then(([listData, countData]) => {
+                        const arr = Array.isArray(listData) ? listData : (listData.data || []);
+                        const totalCount = (countData && (countData.count || countData.total)) || listData.total || 0;
+                        const pages = Math.max(1, Math.ceil((Number(totalCount) || 0) / safeLimit));
+                        setUsers(arr);
+                        setTotal(Number(totalCount) || 0);
+                        setTotalPages(pages);
+                        if (safePage > pages) setPage(pages);
+                    })
+                    .catch(err => {
+                        console.warn("Parallel fetch failed:", err && (err.message || err));
+                        fetch(listUrl)
+                            .then(r => {
+                                if (!r.ok) return r.text().then(t => { throw new Error(t || r.statusText); });
+                                return r.json();
+                            })
+                            .then(listData => {
+                                const arr = Array.isArray(listData) ? listData : (listData.data || []);
+                                const inferredTotal = listData.total || arr.length;
+                                const safeLimit2 = Math.min(Math.max(Number(limit) || MIN_LIMIT, MIN_LIMIT), MAX_LIMIT);
+                                const pages = Math.max(1, Math.ceil((Number(inferredTotal) || 0) / safeLimit2));
+                                setUsers(arr);
+                                setTotal(Number(inferredTotal) || 0);
+                                setTotalPages(pages);
+                            })
+                            .catch(e => {
+                                console.error("Fetch error:", e);
+                                alert("Lỗi khi tải dữ liệu: " + (e.message || e));
+                            })
+                            .finally(() => setLoading(false));
+                        return;
+                    })
+                    .finally(() => setLoading(false));
+            }, [page, limit, search, totalPages]);
+
+            React.useEffect(() => {
+                fetchUsers();
+            }, [fetchUsers]);
+
+            const deleteUser = (id) => {
+                if (!isValidObjectId(id)) {
+                    alert("ID không hợp lệ. Hủy thao tác.");
+                    return;
+                }
+                if (!window.confirm("Bạn có chắc muốn xóa?")) return;
+
+                fetch(`http://localhost:3000/api/users/${id}`, { method: "DELETE" })
+                    .then(async res => {
+                        const text = await res.text();
+                        let body;
+                        try { body = JSON.parse(text); } catch { body = { message: text }; }
+                        if (!res.ok) {
+                            const msg = body && (body.message || body.error) || res.statusText;
+                            throw new Error(`[${res.status}] ${msg}`);
+                        }
+                        alert(body.message || "Xóa thành công");
+                        fetchUsers();
+                    })
+                    .catch(err => alert("Lỗi khi xóa: " + (err.message || err)));
+            };
+
+            return (
+                <div className="container">
+                    <h1>Quản lý Người dùng</h1>
+
+                    <SearchBar value={search} onChange={(v) => { setSearch(v); setPage(1); }} />
+
+                    <button className="btn btn-primary" onClick={() => { setEditingUser(null); setShowModal(true); }}>
+                        Thêm người dùng
+                    </button>
+                    {loading ? <p>Đang tải...</p> : null}
+                    <UserTable
+                        users={users}
+                        page={page}
+                        limit={limit}
+                        onEdit={(user) => { setEditingUser(user); setShowModal(true); }}
+                        onDelete={(id) => deleteUser(id)}
+                    />
+                    <Pagination
+                        page={page}
+                        totalPages={totalPages}
+                        limit={limit}
+                        onPageChange={handleSetPage}
+                        onLimitChange={handleSetLimit}
+                    />
+                    {showModal && (
+                        <UserModal
+                            user={editingUser}
+                            onClose={() => setShowModal(false)}
+                            onSave={() => { fetchUsers(); setShowModal(false); }}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        function SearchBar({ value, onChange }) {
+            return (
+                <div className="search-bar">
+                    <input
+                        type="text"
+                        placeholder="Tìm theo tên, email, địa chỉ..."
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        style={{ width: '100%', padding: '10px', fontSize: '16px' }}
+                    />
+                </div>
+            );
+        }
+
+        function UserTable({ users, onEdit, onDelete, page, limit }) {
+            const handleDelete = (id, name) => {
+                if (!id) return;
+                if (window.confirm(`Bạn có chắc muốn xóa "${name}"?`)) {
+                    onDelete(id);
+                }
+            };
+            return (
+                <table>
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Họ tên</th>
+                            <th>Tuổi</th>
+                            <th>Email</th>
+                            <th>Địa chỉ</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {(!users || users.length === 0) ? (
+                            <tr>
+                                <td colSpan="6" style={{ textAlign: 'center' }}>
+                                    Không có dữ liệu
+                                </td>
+                            </tr>
+                        ) : (
+                            users.map((user, index) => (
+                                <tr key={user._id || index}>
+                                    <td>{((Number(page) - 1) * Number(limit)) + index + 1}</td>
+                                    <td>{user.name}</td>
+                                    <td>{user.age}</td>
+                                    <td>{user.email}</td>
+                                    <td>{user.address || "-"}</td>
+                                    <td>
+                                        <button className="btn btn-ghost" onClick={() => onEdit(user)}>Sửa</button>
+                                        <button className="btn btn-danger" onClick={() => handleDelete(user._id, user.name)}>Xóa</button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            );
+        }
+
+        function Pagination({ page, totalPages, limit, onPageChange, onLimitChange }) {
+            return (
+                <div className="pagination">
+                    <div>
+                        Hiển thị:
+                        <select value={limit} onChange={(e) => onLimitChange(Number(e.target.value))}>
+                            <option value="3">3</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                        </select>
+                        dòng/trang
+                    </div>
+                    <div>
+                        <button onClick={() => onPageChange(page - 1)} disabled={page === 1}>Prev</button>
+                        <span style={{ margin: '0 15px' }}>Trang {page}/{totalPages || 1}</span>
+                        <button onClick={() => onPageChange(page + 1)} disabled={page >= totalPages}>Next</button>
+                    </div>
+                </div>
+            );
+        }
+
+        function UserModal({ user, onClose, onSave }) {
+            const [formData, setFormData] = React.useState(user ? { ...user } : { name: "", age: "", email: "", address: "" });
+            const [errors, setErrors] = React.useState({});
+            const [submitting, setSubmitting] = React.useState(false);
+
+            React.useEffect(() => {
+                setFormData(user ? { ...user } : { name: "", age: "", email: "", address: "" });
+                setErrors({});
+            }, [user]);
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+
+            const validate = async (normalized) => {
+                const newErrors = {};
+                const name = (normalized.name || "").trim();
+                const email = (normalized.email || "").trim().toLowerCase();
+                const age = normalized.age === "" ? "" : Number(normalized.age);
+
+                if (!name || name.length < 2) {
+                    newErrors.name = "Tên phải có ít nhất 2 ký tự";
+                }
+                if (
+                    age === "" ||
+                    Number.isNaN(age) ||
+                    !Number.isInteger(age) ||
+                    age < 0
+                ) {
+                    newErrors.age = "Tuổi phải là số nguyên >= 0";
+                }
+                if (!email || !email.includes("@") || !email.includes(".")) {
+                    newErrors.email = "Email không hợp lệ";
+                }
+                if (!newErrors.email) {
+                    try {
+                        const excludeId = normalized._id ? `&excludeId=${normalized._id}` : "";
+                        const url = `http://localhost:3000/api/users/check-email?email=${encodeURIComponent(email)}${excludeId}`;
+
+                        const res = await fetch(url);
+
+                        if (!res.ok) {
+                            throw new Error(`Lỗi server: ${res.status}`);
+                        }
+
+                        const data = await res.json();
+
+                        if (data.exists) {
+                            newErrors.email = "Email đã được sử dụng";
+                        }
+                    } catch (err) {
+                        console.error("Lỗi kiểm tra email:", err.message);
+                        newErrors.email = "Email đã được sử dụng";
+                    }
+                }
+                setErrors(newErrors);
+
+                return Object.keys(newErrors).length === 0;
+            };
+
+            const handleSubmit = async () => {
+                const normalized = {
+                    name: (formData.name || "").trim(),
+                    email: (formData.email || "").trim().toLowerCase(),
+                    address: (formData.address || "").trim(),
+                    age: formData.age === "" ? "" : parseInt(formData.age, 10)
+                };
+
+                const ok = await validate(normalized);
+                if (!ok) return;
+
+                const payload = {};
+                if (normalized.name !== "") payload.name = normalized.name;
+                if (normalized.email !== "") payload.email = normalized.email;
+                if (normalized.address !== "") payload.address = normalized.address;
+                if (normalized.age !== "") payload.age = normalized.age;
+                if (!user) {
+                    if (!payload.name || !payload.email || payload.age === undefined || payload.age === "") {
+                        alert("Vui lòng nhập đầy đủ thông tin bắt buộc (Họ tên, Email, Tuổi).");
+                        return;
+                    }
+                }
+
+                const url = user ? `http://localhost:3000/api/users/${user._id}` : `http://localhost:3000/api/users`;
+                const method = user ? "PUT" : "POST";
+
+                setSubmitting(true);
+                fetch(url, {
+                    method,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                })
+                    .then(async res => {
+                        const text = await res.text();
+                        let body;
+                        try { body = JSON.parse(text); } catch { body = { message: text }; }
+                        if (!res.ok) {
+                            const msg = body && (body.message || body.error) || res.statusText;
+                            throw new Error(`[${res.status}] ${msg}`);
+                        }
+                        return body;
+                    })
+                    .then(data => {
+                        alert(data.message || (user ? "Cập nhật thành công" : "Tạo mới thành công"));
+                        onSave();
+                    })
+                    .catch(err => alert("Lỗi khi lưu: " + (err.message || err)))
+                    .finally(() => setSubmitting(false));
+            };
+
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <h3>{user ? "Sửa người dùng" : "Thêm người dùng"}</h3>
+                        <label>Họ tên *</label>
+                        <input name="name" value={formData.name} onChange={handleChange} />
+                        {errors.name && <p className="error">{errors.name}</p>}
+                        <label>Tuổi *</label>
+                        <input name="age" type="number" value={formData.age} onChange={handleChange} />
+                        {errors.age && <p className="error">{errors.age}</p>}
+                        <label>Email *</label>
+                        <input name="email" type="email" value={formData.email} onChange={handleChange} />
+                        {errors.email && <p className="error">{errors.email}</p>}
+                        <label>Địa chỉ</label>
+                        <input name="address" value={formData.address} onChange={handleChange} />
+                        <div className="modal-actions">
+                            <button className="btn btn-primary" onClick={handleSubmit} disabled={submitting}>{submitting ? "Đang..." : "Lưu"}</button>
+                            <button className="btn btn-ghost" onClick={onClose} disabled={submitting}>Hủy</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
