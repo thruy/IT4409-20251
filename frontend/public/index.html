@@ -265,7 +265,7 @@
         function App() {
             const MIN_LIMIT = 1;
             const MAX_LIMIT = 100;
-
+            const API_BASE = process.env.REACT_APP_API_BASE_URL;
             const [users, setUsers] = React.useState([]);
             const [page, setPage] = React.useState(1);
             const [limit, setLimit] = React.useState(5);
@@ -296,8 +296,8 @@
                 const safeLimit = Math.min(Math.max(Number(limit) || MIN_LIMIT, MIN_LIMIT), MAX_LIMIT);
                 const q = encodeURIComponent((search || "").trim());
 
-                const listUrl = `http://localhost:3000/api/users?page=${safePage}&limit=${safeLimit}&search=${q}`;
-                const countUrl = `http://localhost:3000/api/users/count?search=${q}`;
+                const listUrl = `${API_BASE}/api/users?page=${safePage}&limit=${safeLimit}&search=${q}`;
+                const countUrl = `${API_BASE}/api/users/count?search=${q}`;
 
                 setLoading(true);
                 Promise.all([fetch(listUrl), fetch(countUrl)])
