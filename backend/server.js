@@ -1,16 +1,16 @@
+require("dotenv").config({ quiet: true });
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-
 const app = express();
-
+const PORT = process.env.PORT || 3000;
 //middleware
 app.use(cors());
 app.use(express.json());
 
 //ket noi database
 mongoose
-    .connect("mongodb+srv://20225191:20225191@cluster.zn1axnp.mongodb.net/it4409?appName=Cluster")
+    .connect(process.env.MONGODB_URI)
     .then(() => { console.log("Connected to MongoDB"); })
     .catch((err) => { console.error("Error connecting to MongoDB:", err); });
 
@@ -171,4 +171,4 @@ app.delete("/api/users/:id", async (req, res) => {
     }
 });
 //start server
-app.listen(3000, () => { console.log("Server is running on http://localhost:3000"); });
+app.listen(PORT, () => { console.log("Server is running on http://localhost:3000"); });
