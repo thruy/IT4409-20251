@@ -28,10 +28,10 @@ jobs:
       - name: Build and push Docker image 
         uses: docker/build-push-action@v5 
         with: 
-          context: . 
-          file: Dockerfile 
+          context: ./backend
+          file: ./backend/Dockerfile 
           push: true 
-          tags: lamdb/it4409-sample:staging 
+          tags: hoangnh/it4409-usermanagement:staging 
   deploy: 
     name: Deploy to Server 
     runs-on: ubuntu-latest 
